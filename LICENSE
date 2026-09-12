@@ -1,16 +1,37 @@
-MIT License
+Nebula Source Available License (NSAL) 1.0
 
-Copyright (c) 2026 Nebula contributors
+Copyright (c) 2026 Just Verhagen
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Permission
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Permission is granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to use, copy,
+modify, and create derivative works of the Software for personal,
+non-commercial purposes.
+
+You may publish your changes in a fork or branch and submit them to the
+upstream Nebula repository as a pull request. Submission does not grant the
+submitter permission to merge changes into the upstream main branch.
+
+2. Conditions
+
+This license notice and these conditions must be included with all copies and
+substantial portions of the Software.
+
+The Software, copies of the Software, modified versions, derivative works, and
+bundled distributions may not be sold, licensed for a fee, rented, leased,
+used in a paid product or service, or otherwise commercially redistributed
+without prior written permission from the copyright holder.
+
+No trademark rights are granted. The Nebula name, logos, and branding may not
+be used to imply endorsement of a fork or derivative work without permission.
+
+3. Commercial permission
+
+Commercial use, paid distribution, app-store distribution, and inclusion in a
+commercial product require a separate written license from Just Verhagen.
+
+4. Disclaimer
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

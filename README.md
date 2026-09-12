@@ -135,7 +135,12 @@ The suite covers artwork detection, event scheduling, warm restoration, configur
 
 ## Contributing
 
-Issues and pull requests are welcome. Please include tests for provider or engine changes and avoid committing real addresses, entity IDs, tokens, logs, build outputs, or local configuration.
+Issues, forks, branches, and pull requests are welcome. Contributors may make
+their own changes in a fork or branch and submit a pull request. The upstream
+`main` branch is maintained by the project owner; pull requests are reviewed
+before anything is merged. Please include tests for provider or engine changes
+and avoid committing real addresses, entity IDs, tokens, logs, build outputs,
+or local configuration.
 
 ## References
 
@@ -147,4 +152,7 @@ Issues and pull requests are welcome. Please include tests for provider or engin
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Nebula uses the [Nebula Source Available License](LICENSE). Personal,
+non-commercial use and modification are allowed. Selling Nebula, bundling it
+in a paid product or service, or commercially redistributing it requires prior
+written permission from Just Verhagen.
