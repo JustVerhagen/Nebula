@@ -36,6 +36,16 @@ python nebula.py
 
 On first launch, click the orbital icon in the menu bar. The setup guide helps connect lights and request Spotify window-capture permission.
 
+### Install Nebula in Applications
+
+From this folder, run:
+
+```sh
+python install.py
+```
+
+This builds `Nebula.app` and copies it to `/Applications/Nebula.app`. After installation, press **Command-Space**, type **Nebula**, and press **Return**. You can also keep Nebula in the Dock. Running `python install.py` again updates the installed app while preserving your settings and Keychain credentials.
+
 To build `Nebula.app`:
 
 ```sh
