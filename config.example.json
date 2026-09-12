@@ -1,0 +1,19 @@
+{
+  "enabled": false,
+  "onboarding_complete": false,
+  "connections": [],
+  "lights": [],
+  "theme": "dark",
+  "return_mode": "warm",
+  "return_color": "#FFCD9B",
+  "warm_kelvin": 3000,
+  "transition_seconds": 0.25,
+  "minimum_color_change": 12,
+  "fallback_seconds": 5,
+  "login": true,
+  "fullscreen_labels": ["Exit full screen"],
+  "sample_points": [[0.08, 0.22]],
+  "patch_size": 20,
+  "interval_seconds": 1,
+  "idle_seconds": 3
+}
