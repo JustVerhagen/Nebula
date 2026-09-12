@@ -105,6 +105,16 @@ class NebulaDelegate(F.NSObject):
 
     @objc.python_method
     def setupInterface(self):
+        menu = A.NSMenu.alloc().init()
+        edit_item = A.NSMenuItem.alloc().initWithTitle_action_keyEquivalent_('Edit', None, '')
+        edit_menu = A.NSMenu.alloc().initWithTitle_('Edit')
+        for title, action, key in [('Undo', 'undo:', 'z'), ('Cut', 'cut:', 'x'),
+                                   ('Copy', 'copy:', 'c'), ('Paste', 'paste:', 'v'),
+                                   ('Select All', 'selectAll:', 'a')]:
+            edit_menu.addItemWithTitle_action_keyEquivalent_(title, action, key)
+        edit_item.setSubmenu_(edit_menu)
+        menu.addItem_(edit_item)
+        A.NSApp.setMainMenu_(menu)
         self.child = self.worker_log = None
         self.results = queue.Queue()
         self.last_json = ''
@@ -165,6 +175,7 @@ class NebulaDelegate(F.NSObject):
     def background_(self, body):
         config = json.loads(json.dumps(self.config)); results = self.results
         def work():
+            nonlocal config
             import keyring
             try:
                 action = body['action']
@@ -173,12 +184,18 @@ class NebulaDelegate(F.NSObject):
                     secret = str(body.get('secret', '')).strip()
                     if connection['kind'] == 'hue' and not secret:
                         response = _request(requests.Session(), 'POST', connection['address'] + '/api',
-                                            json={'devicetype': 'nebula#mac'})
+                                            json={'devicetype': 'nebula#mac'}, verify=False)
                         if not response or 'success' not in response[0]:
                             raise ValueError('Press the round button on your Hue Bridge, then try again.')
                         secret = response[0]['success']['username']
+                    if connection['kind'] == 'nanoleaf' and not secret:
+                        response = _request(requests.Session(), 'POST', connection['address'] + '/api/v1/new')
+                        secret = response.get('auth_token', '')
+                        if not secret:
+                            raise ValueError('Put Nanoleaf into pairing mode, then connect within 30 seconds.')
                     provider = make_provider(connection, secret)
-                    lights = provider.lights()
+                    entity = str(body.get('entity_id', '')).strip()
+                    lights = provider.lights(entity) if connection['kind'] == 'home_assistant' else provider.lights()
                     if not lights: raise ValueError('Connected, but no lights were found.')
                     config['connections'] = [c for c in config['connections'] if c['id'] != connection['id']] + [connection]
                     existing = {(l['connection_id'], l['id']): l for l in config['lights']}
@@ -214,7 +231,11 @@ class NebulaDelegate(F.NSObject):
                             light['sync'] = bool(body['sync'])
                     results.put({'config': config})
                 elif action == 'remove_connection':
-                    cid = body['connection_id']; keyring.delete_password(SECRET_SERVICE, cid)
+                    cid = body['connection_id']
+                    try:
+                        keyring.delete_password(SECRET_SERVICE, cid)
+                    except keyring.errors.PasswordDeleteError:
+                        pass
                     config['connections'] = [c for c in config['connections'] if c['id'] != cid]
                     config['lights'] = [l for l in config['lights'] if l['connection_id'] != cid]
                     results.put({'config': config, 'message': 'Lighting system removed.'})

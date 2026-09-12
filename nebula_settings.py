@@ -31,9 +31,22 @@ def connection_from_input(incoming):
         raise ValueError('Choose Home Assistant, Philips Hue, Nanoleaf, or WLED.')
     names = {'home_assistant': 'Home Assistant', 'hue': 'Philips Hue',
              'nanoleaf': 'Nanoleaf', 'wled': 'WLED'}
+    from urllib.parse import urlsplit, urlunsplit
+    address = str(incoming.get('address', '')).strip()
+    if address and '://' not in address:
+        address = ('https://' if kind == 'hue' else 'http://') + address
+    address = clean_url(address)
+    parsed = urlsplit(address)
+    if parsed.path not in ('', '/') or parsed.query or parsed.fragment:
+        raise ValueError('Use the server or device base address, without a dashboard path or query.')
+    if kind == 'hue':
+        address = urlunsplit(('https', parsed.netloc, '', '', ''))
+    elif kind == 'nanoleaf' and parsed.port is None:
+        host = '[' + parsed.hostname + ']' if ':' in parsed.hostname else parsed.hostname
+        address = urlunsplit((parsed.scheme, host + ':16021', '', '', ''))
     return {'id': str(incoming.get('id') or uuid.uuid4().hex[:12]), 'kind': kind,
             'name': str(incoming.get('name') or names[kind]).strip()[:60],
-            'address': clean_url(str(incoming.get('address', '')))}
+            'address': address}
 
 
 def edited(config, incoming):

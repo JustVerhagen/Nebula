@@ -6,6 +6,7 @@ without touching the Spotify engine or the interface.
 from __future__ import annotations
 
 import colorsys
+import re
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
@@ -80,16 +81,19 @@ class HomeAssistantProvider(BaseProvider):
     def _api(self, method, path, **kwargs):
         return _request(self.session, method, self.base + '/api/' + path, **kwargs)
 
-    def lights(self):
+    def lights(self, entity_id=''):
+        if entity_id and not re.fullmatch(r'light\.[a-z0-9_]+', entity_id):
+            raise ValueError('Enter a light entity ID such as light.desk, or leave blank to discover lights.')
         result = []
-        for state in self._api('GET', 'states'):
+        states = [self._api('GET', 'states/' + entity_id)] if entity_id else self._api('GET', 'states')
+        for state in states:
             if not state.get('entity_id', '').startswith('light.'):
                 continue
             attrs = state.get('attributes', {})
             rgb = attrs.get('rgb_color')
             result.append(Light(state['entity_id'], attrs.get('friendly_name') or state['entity_id'],
                                 state.get('state') == 'on', tuple(rgb) if rgb else None,
-                                attrs.get('brightness')))
+                                round(attrs['brightness'] / 2.55) if attrs.get('brightness') is not None else None))
         return result
 
     def set_state(self, light_id, *, on=None, rgb=None, brightness=None, transition=.25):
@@ -127,7 +131,10 @@ class HueProvider(BaseProvider):
         self.session.headers['hue-application-key'] = secret
 
     def _api(self, method, path, **kwargs):
-        return _request(self.session, method, self.base + '/clip/v2/resource/' + path, verify=False, **kwargs)
+        response = _request(self.session, method, self.base + '/clip/v2/resource/' + path, verify=False, **kwargs)
+        if response.get('errors'):
+            raise ProviderError('Hue rejected the request. Check Bridge pairing and light capabilities.')
+        return response
 
     def lights(self):
         rows = self._api('GET', 'light').get('data', [])
@@ -140,7 +147,8 @@ class HueProvider(BaseProvider):
         if on is not None:
             payload['on'] = {'on': bool(on)}
         if rgb is not None:
-            payload['color'] = {'xy': rgb_to_xy(rgb)}
+            x, y = rgb_to_xy(rgb)
+            payload['color'] = {'xy': {'x': x, 'y': y}}
         if brightness is not None:
             payload['dimming'] = {'brightness': max(.1, min(100, brightness))}
         self._api('PUT', 'light/' + light_id, json=payload)

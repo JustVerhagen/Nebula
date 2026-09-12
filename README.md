@@ -1,6 +1,17 @@
-# Nebula
+# 🌌 Nebula
 
-Nebula is a private, open-source macOS menu-bar app that turns Spotify artwork into room-wide colour. It also gives you a fast, independent control panel for every connected light—no Home Assistant dashboard required.
+### Your music. Your lights. One atmosphere.
+
+![macOS](https://img.shields.io/badge/macOS-14.2%2B-black?logo=apple)
+![License: MIT](https://img.shields.io/badge/license-MIT-a783ff)
+
+The next track starts. The artwork changes. Your room follows.
+
+Nebula lives in your Mac’s menu bar and turns Spotify artwork into room-wide colour. Pick the lights that follow your music, mix supported systems, and change power, colour, or brightness without leaving your desktop. No Spotify developer account is needed.
+
+**Made for late-night playlists, desk setups, and rooms that feel like the music playing in them.**
+
+[Get started](#install-from-source) · [Connect your lights](#connecting-lights) · [How it works](#how-spotify-sync-works) · [Contribute](#contributing)
 
 ## What’s new in 2.0
 
@@ -40,10 +51,44 @@ The unsigned app appears in `dist/Nebula.app`. Public distribution requires Appl
 | --- | --- | --- |
 | Home Assistant | Server address and long-lived token | Local or remote REST API |
 | Philips Hue | Bridge address; press its link button | Hue Bridge API v2, local |
-| Nanoleaf | Device address and OpenAPI token | Local REST API |
+| Nanoleaf | Device address; enable pairing mode | Local OpenAPI; token created in Nebula |
 | WLED | Device address | Local JSON API |
 
 Nebula’s provider interface lives in `providers.py`. New systems implement discovery plus one `set_state` method, keeping the Spotify engine independent from device-specific APIs.
+
+### Home Assistant
+
+1. Enter your server’s base address, such as `http://homeassistant.local:8123`.
+2. Create a long-lived access token in your Home Assistant profile under Security. Paste it using **⌘V**.
+3. Enter an entity ID such as `light.desk` to connect that light, or leave the field blank to discover all lights.
+4. Connect, then select the lights that should follow Spotify. Entity IDs are available in Home Assistant’s entity settings.
+
+### Philips Hue
+
+Use a Hue Bridge on the same network as your Mac. Find its IP in the Hue app’s Bridge settings, enter it, press the physical link button, then click Connect. Nebula creates its own application key and lists the Bridge’s lights. Bluetooth-only Hue setups are not supported.
+
+### Nanoleaf
+
+Enter the controller’s IP; Nebula adds port 16021 automatically. Leave the token blank to pair. On Light Panels, Shapes, Canvas, Lines, or Elements, hold Power for 5–7 seconds until the LED flashes, then click Connect within 30 seconds. For Skylight, enable **Connect to API** in the Nanoleaf app first. A saved OpenAPI token can also be pasted. This adapter does not cover Essentials/Matter or USB products; each panel installation is controlled as one device.
+
+### WLED
+
+Enter the WLED controller’s IP or hostname, such as `http://wled.local`, and connect. No token is required. Add another connection for each controller. This version offers controller-level controls, not individual segment mapping.
+
+### First song
+
+Allow Spotify window capture in macOS when prompted, then open Spotify’s artwork player. Keep that window open and switch on **Follow Spotify**. Use the light selectors to decide which lights participate. Pause sync before choosing a manual colour you want to keep.
+
+### Troubleshooting
+
+- **Can’t paste?** The app supports standard Mac Edit shortcuts: ⌘C, ⌘V, ⌘X, and ⌘A. Restart the updated app if an older copy is still running.
+- **Home Assistant cannot connect:** use the base URL without `/lovelace`, verify the token, and confirm the entity starts with `light.`.
+- **Hue or Nanoleaf pairing fails:** enable pairing again and retry promptly. Your Mac and device must be able to reach each other on the network.
+- **Spotify colours don’t change:** check Screen Recording permission, restart if macOS requests it, and ensure the artwork view is open.
+
+### Current release status
+
+Nebula is an early community release. Automated tests exercise provider requests, but they are not a substitute for testing every physical lighting model. Colour controls require colour-capable hardware. The warm return currently uses an RGB approximation. LIFX and direct Matter support are not included. Hue’s local self-signed HTTPS certificate is currently accepted without certificate verification; use it only on a trusted local network.
 
 ## How Spotify sync works
 
